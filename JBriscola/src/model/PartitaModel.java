@@ -43,20 +43,19 @@ public class PartitaModel extends Observable {
     public void iniziaPartita() {
         mazzo.mescola();
         
-        // Pesca la carta di briscola (scoperta in fondo al mazzo)
-        // Usiamo ifPresentOrElse in una vera applicazione, qui assumiamo mazzo pieno
-        this.briscola = mazzo.pesca().orElseThrow();
-        
-        // La briscola pescata va tecnicamente rimessa in fondo al mazzo o tenuta da parte
-        // Per semplicità logica, la teniamo nel campo 'briscola', ma nel gioco reale 
-        // l'ultima carta pescata è proprio questa.
+        // Guarda la carta di briscola (scoperta in fondo al mazzo)
+        this.briscola = mazzo.peekUltima();  
         
         distribuisciCarte();
         
         // Inizializza la prima mano
         manoAttuale = new Mano(briscola.getSeme(), giocatori.size());
         
-        impostaStato(StatoPartita.ATTESA_GIOCATORE);
+        if (getGiocatoreCorrente() instanceof GiocatoreAI) {
+            impostaStato(StatoPartita.AI_IN_GIOCO);
+        } else {
+            impostaStato(StatoPartita.ATTESA_GIOCATORE);
+        }
     }
 
     /**

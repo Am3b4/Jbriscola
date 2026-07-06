@@ -7,7 +7,7 @@ import java.util.List;
  * Classe astratta che rapresenta un generico giocatore di Briscola
  */
 
-public class Giocatore {
+public abstract class Giocatore {
 	protected String nome;
 	protected List<Carta> mano;
 	protected List<Carta> cartePrese;
@@ -21,6 +21,8 @@ public class Giocatore {
 		this.mano = new ArrayList<>();
 		this.cartePrese = new ArrayList<>();
 	}
+	
+	public abstract Carta scegliCarta(List<Carta> tavolo, Seme briscola);
 	
 	/**
      * Aggiunge una carta alla mano del giocatore (es. dopo aver pescato).

@@ -1,7 +1,10 @@
 package model;
+import java.util.List;
+
 
 /** * Rappresenta l'utente fisico che gioca la partita.
  */
+
 public class GiocatoreUmano extends Giocatore {
 
     /**
@@ -12,7 +15,9 @@ public class GiocatoreUmano extends Giocatore {
         super(nome);
     }
     
-    // Non è necessario implementare un metodo di "scelta automatica" della carta qui,
-    // poiché l'azione è interattiva e verrà gestita tramite eventi (click sui bottoni) 
-    // catturati e processati dal Controller.
+    @Override
+    public Carta scegliCarta(List<Carta> tavolo, Seme briscola) {
+        throw new UnsupportedOperationException(
+            "La scelta della carta per il giocatore umano arriva dal Controller tramite eventi GUI.");
+    }
 }

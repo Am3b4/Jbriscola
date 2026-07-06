@@ -54,6 +54,18 @@ public class Mazzo {
         }
         return carte.get(0);
     }
+    
+    /**
+     * Guarda l'ultima carta del mazzo senza rimuoverla (utile per vedere la briscola).
+     * 
+     * @return La carta in coda, o null se il mazzo è vuoto.
+     */
+    public Carta peekUltima() {
+        if (carte.isEmpty()) {
+            return null;
+        }
+        return carte.get(carte.size() - 1);
+    }
 
     /**
      * Verifica se il mazzo è vuoto.

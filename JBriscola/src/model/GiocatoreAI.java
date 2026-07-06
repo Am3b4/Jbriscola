@@ -30,6 +30,7 @@ public class GiocatoreAI extends Giocatore {
      * @param briscola Il seme di briscola della partita corrente.
      * @return La carta selezionata dall'AI.
      */
+    @Override
     public Carta scegliCarta(List<Carta> tavolo, Seme briscola) {
         // Delega la scelta alla strategia, passandogli la mano attuale (ereditata da Giocatore),
         // lo stato del tavolo e la briscola.
