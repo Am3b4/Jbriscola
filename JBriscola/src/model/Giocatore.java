@@ -57,6 +57,10 @@ public abstract class Giocatore {
     public List<Carta> getMano() {
         return mano;
     }
+    
+    public List<Carta> getCartePrese() {
+        return cartePrese;
+    }
 
     public String getNome() {
         return nome;

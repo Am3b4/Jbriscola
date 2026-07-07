@@ -41,21 +41,32 @@ public class PartitaModel extends Observable {
      * Avvia la partita: mescola il mazzo, pesca la briscola e distribuisce le carte iniziali.
      */
     public void iniziaPartita() {
+        // 1. Preparazione del mazzo
         mazzo.mescola();
-        
-        // Guarda la carta di briscola (scoperta in fondo al mazzo)
         this.briscola = mazzo.peekUltima();  
         
+        // 2. Pulizia dello stato dei giocatori (fondamentale per le partite successive alla prima)
+        for (Giocatore g : giocatori) {
+            g.getMano().clear();
+            g.getCartePrese().clear();
+        }
+        
+        // 3. Distribuzione iniziale (3 carte a testa)
         distribuisciCarte();
         
-        // Inizializza la prima mano
+        // 4. Inizializza la primissima mano (presa) della partita
         manoAttuale = new Mano(briscola.getSeme(), giocatori.size());
         
+        // 5. Determina a chi tocca e aggiorna lo stato
         if (getGiocatoreCorrente() instanceof GiocatoreAI) {
             impostaStato(StatoPartita.AI_IN_GIOCO);
         } else {
             impostaStato(StatoPartita.ATTESA_GIOCATORE);
         }
+        
+        // 6. FONDAMENTALE: Forza la notifica alla View che tutto è pronto
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -170,7 +181,7 @@ public class PartitaModel extends Observable {
      * Restituisce una lista dei giocatori ordinata in base al punteggio decrescente.
      * Implementazione richiesta dal documento usando gli Stream.
      * 
-     * @return Lista di giocatori ordinata (il primo è il vincitore).
+     * @return Lista di giocatori ordinata (il primo è il vincitore). X 	
      */
     public List<Giocatore> calcolaClassifica() {
         return giocatori.stream()
