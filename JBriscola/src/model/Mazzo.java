@@ -44,7 +44,7 @@ public class Mazzo {
     }
 
     /**
-     * Guarda la prima carta del mazzo senza rimuoverla (utile per vedere qual la prossima carta).
+     * Guarda la prima carta del mazzo senza rimuoverla (utile per vedere qual è la prossima carta).
      * 
      * @return La carta in cima, o null se il mazzo è vuoto.
      */
@@ -86,7 +86,7 @@ public class Mazzo {
     }
 
     /**
-     * Espone uno Stream delle carte nel mazzo, come richiesto dal diagramma UML.
+     * Espone uno Stream delle carte nel mazzo, come richiesto dalle specifiche.
      * 
      * @return Uno stream delle carte.
      */

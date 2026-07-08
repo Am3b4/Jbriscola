@@ -25,7 +25,7 @@ public class PartitaModel extends Observable {
      * @param giocatori La lista dei giocatori 
      */
     public PartitaModel(List<Giocatore> giocatori) {
-        this.giocatori = giocatori;
+    	this.giocatori = new java.util.ArrayList<>(giocatori);
         this.mazzo = new Mazzo();
         this.turnoIndex = 0;
     }
@@ -80,42 +80,85 @@ public class PartitaModel extends Observable {
         }
         notificaCambiamento();
     }
+    
+    /**
+     * Sostituisce la lista dei giocatori attuale con una nuova.
+     * Necessario per cambiare tra modalità 1v1 e 2v2.
+     */
+    public void impostaGiocatori(List<Giocatore> nuoviGiocatori) {
+        this.giocatori.clear();
+        this.giocatori.addAll(nuoviGiocatori);
+        this.turnoIndex = 0;
+    }
+    
 
     /**
      * Registra la mossa del giocatore corrente e fa avanzare lo stato del gioco.
      * 
      * @param carta La carta giocata dal giocatore.
      */
-    public void giocaCarta(Carta carta) {
-        Giocatore giocatoreCorrente = getGiocatoreCorrente();
+    public void giocaCarta(model.Carta c) {
+        Giocatore corrente = getGiocatoreCorrente();
         
-        // Il giocatore gioca la carta (la rimuove dalla sua mano e la mette sul tavolo)
-        giocatoreCorrente.rimuoviCarta(carta);
-        manoAttuale.gioca(giocatoreCorrente, carta);
-        
-        // Se la mano è completa, gestiamo la fine della mano
+        // 1. Il giocatore cala la carta sul tavolo e la toglie dalla sua mano
+        manoAttuale.gioca(corrente, c);
+        corrente.rimuoviCarta(c);
+
+        // 2. Controllo: La presa è finita?
         if (manoAttuale.isCompleta()) {
             impostaStato(StatoPartita.FINE_MANO);
-            gestisciFineMano();
-        } else {
-            // Altrimenti, passiamo il turno al giocatore successivo
-            avanzaTurno();
-            
-            // Aggiorniamo lo stato a seconda di chi deve giocare ora
-            if (getGiocatoreCorrente() instanceof GiocatoreAI) {
-                impostaStato(StatoPartita.AI_IN_GIOCO);
-            } else {
-                impostaStato(StatoPartita.ATTESA_GIOCATORE);
-            }
+            setChanged();
+            notifyObservers(); 
+            return;
         }
+
+        // 3. Se la presa NON è finita, il turno passa al prossimo giocatore
+        // (0 diventa 1, 1 diventa 0)
+        turnoIndex = (turnoIndex + 1) % giocatori.size();
+
+        // 4. Aggiorniamo lo stato in base a chi tocca ora
+        if (getGiocatoreCorrente() instanceof GiocatoreAI) {
+            impostaStato(StatoPartita.AI_IN_GIOCO);
+        } else {
+            impostaStato(StatoPartita.ATTESA_GIOCATORE);
+        }
+
+        // 5. Notifichiamo la View per far aggiornare il tavolo
+        setChanged();
+        notifyObservers();
     }
 
     /**
      * Passa il turno al giocatore successivo.
      */
     public void avanzaTurno() {
-        turnoIndex = (turnoIndex + 1) % giocatori.size();
-        notificaCambiamento();
+        // 1. Determina chi ha vinto la presa
+        Giocatore vincitore = manoAttuale.determinaVincitore();
+        System.out.println("[MODEL] Presa vinta da: " + vincitore.getNome());
+        
+        // 2. Assegna le carte sul tavolo al vincitore
+        vincitore.aggiungiPresa(manoAttuale.getCarteGiocate());
+        
+        // 3. Il vincitore sarà il primo a giocare nella prossima mano
+        turnoIndex = giocatori.indexOf(vincitore);
+        
+        // 4. Pesca nuove carte dal mazzo
+        pescaCarte();
+        
+        // 5. Controlla se la partita è finita
+        if (isPartitaFinita()) {
+            impostaStato(StatoPartita.FINE_PARTITA);
+        } else {
+            // Prepara una nuova mano pulita sul tavolo
+            manoAttuale = new Mano(briscola.getSeme(), giocatori.size());
+            
+            // Ripristina lo stato in base a chi ha vinto (e quindi chi inizia la nuova mano)
+            if (getGiocatoreCorrente() instanceof GiocatoreAI) {
+                impostaStato(StatoPartita.AI_IN_GIOCO);
+            } else {
+                impostaStato(StatoPartita.ATTESA_GIOCATORE);
+            }
+        }
     }
 
     /**

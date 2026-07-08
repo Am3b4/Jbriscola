@@ -4,6 +4,8 @@ import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+/** Classe del menu principale. E' il primo pannello che verra creato
+ * */
 @SuppressWarnings("serial")
 public class MainMenuPanel extends JPanel {
     
@@ -12,7 +14,7 @@ public class MainMenuPanel extends JPanel {
     private final JButton btnEsci;
 
     public MainMenuPanel() {
-        setBackground(new Color(245, 245, 220));
+        setBackground(new Color(245, 245, 220)); // Beige chiaro
         
         btnNuovaPartita = new JButton("Nuova Partita");
         btnProfilo = new JButton("Profilo");

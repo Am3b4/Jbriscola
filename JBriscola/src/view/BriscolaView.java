@@ -18,10 +18,12 @@ public class BriscolaView extends JFrame {
     public static final String SCHERMATA_MENU = "MENU";
     public static final String SCHERMATA_GIOCO = "GIOCO";
     public static final String SCHERMATA_PROFILO = "PROFILO";
+    public static final String SCHERMATA_MODALITA = "MODALITA";
 
     // Riferimenti ai vari pannelli (le schermate vere e proprie)
     private final MainMenuPanel menuPanel;
     private final GamePanel gamePanel;
+    private final SelezionaModalitaPanel modalitaPanel;
     private final JPanel profiloPanel; // Per ora usiamo un JPanel generico come placeholder
 
     public BriscolaView() {
@@ -29,23 +31,25 @@ public class BriscolaView extends JFrame {
 
         // 1. Setup di base della finestra
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600); // Risoluzione iniziale (puoi regolarla in seguito)
+        setSize(1200, 900); // Risoluzione iniziale (regolabile in seguito)
         setLocationRelativeTo(null); // Centra la finestra al centro dello schermo
         setResizable(false); // Blocca il ridimensionamento per non rompere il layout grafico
 
         // 2. Inizializzazione del Layout e del pannello contenitore
         cardLayout = new CardLayout();
         pannelloPrincipale = new JPanel(cardLayout);
+        modalitaPanel = new SelezionaModalitaPanel();
 
         // 3. Istanziazione dei pannelli specifici
         menuPanel = new MainMenuPanel();
         gamePanel = new GamePanel();
-        profiloPanel = new JPanel(); // Placeholder per la Fase 7 come da Todo List
+        profiloPanel = new JPanel();
 
         // 4. Aggiunta dei pannelli al CardLayout con la loro etichetta identificativa
         pannelloPrincipale.add(menuPanel, SCHERMATA_MENU);
         pannelloPrincipale.add(gamePanel, SCHERMATA_GIOCO);
         pannelloPrincipale.add(profiloPanel, SCHERMATA_PROFILO);
+        pannelloPrincipale.add(modalitaPanel, SCHERMATA_MODALITA);
 
         // 5. Aggiunge il contenitore principale al JFrame
         add(pannelloPrincipale);
@@ -64,13 +68,18 @@ public class BriscolaView extends JFrame {
     public void mostraProfilo() {
         cardLayout.show(pannelloPrincipale, SCHERMATA_PROFILO);
     }
+    public void mostraModalita() {
+        cardLayout.show(pannelloPrincipale, SCHERMATA_MODALITA);
+    }
 
     // Getter per esporre i pannelli al Controller (utile per aggiungere gli ActionListener)
     public MainMenuPanel getMenuPanel() {
         return menuPanel;
     }
-
     public GamePanel getGamePanel() {
         return gamePanel;
+    }
+    public SelezionaModalitaPanel getModalitaPanel() {
+        return modalitaPanel;
     }
 }

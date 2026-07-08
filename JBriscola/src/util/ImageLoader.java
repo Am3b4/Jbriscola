@@ -43,7 +43,7 @@ public class ImageLoader {
     }
 
     /**
-     * Ridimensiona un'immagine (metodo specificato nell'UML).
+     * Ridimensiona un'immagine .
      * Anche le immagini ridimensionate vengono salvate in cache per evitare
      * di fare calcoli grafici ripetuti sulla stessa carta.
      * 
@@ -121,6 +121,6 @@ public class ImageLoader {
      * Restituisce il percorso esatto del dorso del mazzo
      */
     public String getPercorsoDorso() {
-        return "resources/img/carte/_Dorso.png";
+        return "resources/img/cards/_Dorso.png";
     }
 }

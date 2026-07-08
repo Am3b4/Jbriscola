@@ -34,7 +34,7 @@ public class TavoloPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false); // Trasparente per far vedere il tappeto verde sotto
 
-        // --- 1. ZONA MAZZO E BRISCOLA (Posizionata a sinistra) ---
+        //ZONA MAZZO E BRISCOLA (Posizionata a sinistra)
         JPanel areaMazzo = new JPanel();
         // BoxLayout verticale per impilare contatore, mazzo e briscola
         areaMazzo.setLayout(new BoxLayout(areaMazzo, BoxLayout.Y_AXIS));
@@ -53,8 +53,14 @@ public class TavoloPanel extends JPanel {
             ImageIcon retroIcon = imageLoader.getImmagineScalata("resources/img/cards/_Dorso.png", 90, 135);
             lblRetroMazzo.setIcon(retroIcon);
         } catch (Exception e) {
-            lblRetroMazzo.setText("[DORSO MAZZO]");
-            lblRetroMazzo.setForeground(Color.WHITE);
+            // Fallback: Se l'immagine fallisce, disegna una finta carta grigia
+        	lblRetroMazzo.setText("[ DORSO ]");
+        	lblRetroMazzo.setOpaque(true);
+        	lblRetroMazzo.setBackground(java.awt.Color.GRAY);
+        	lblRetroMazzo.setForeground(java.awt.Color.WHITE);
+        	lblRetroMazzo.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK));
+        	lblRetroMazzo.setPreferredSize(new java.awt.Dimension(90, 135));
+        	lblRetroMazzo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         }
 
         // Immagine della Briscola (scoperta sotto il mazzo)
@@ -64,7 +70,7 @@ public class TavoloPanel extends JPanel {
         areaMazzo.add(lblRetroMazzo);
         areaMazzo.add(lblBriscola);
 
-        // --- 2. ZONA CARTE SUL TAVOLO (Posizionata al centro) ---
+        //ZONA CARTE SUL TAVOLO (Posizionata al centro)
         carteGiocatePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         carteGiocatePanel.setOpaque(false);
 
@@ -87,8 +93,16 @@ public class TavoloPanel extends JPanel {
         // 2. Aggiorna l'area del Mazzo e della Briscola
         // Se ci sono carte nel mazzo, la briscola è ancora visibile sotto
         if (carteRimanenti > 0 && briscola != null) {
-        	String percorsoBriscola = imageLoader.getPercorsoCarta(briscola);
-            lblBriscola.setIcon(imageLoader.getImmagineScalata(percorsoBriscola, 80, 120)); 
+            String percorsoBriscola = imageLoader.getPercorsoCarta(briscola);
+            ImageIcon iconaBriscola = imageLoader.getImmagineScalata(percorsoBriscola, 80, 120);
+            
+            if (iconaBriscola != null && iconaBriscola.getIconWidth() > 0) {
+                lblBriscola.setIcon(iconaBriscola);
+                lblBriscola.setText(""); // Pulisce eventuale testo
+            } else {
+                lblBriscola.setText("[" + briscola.getValore() + " " + briscola.getSeme() + "]");
+                lblBriscola.setForeground(Color.WHITE);
+            }
             lblRetroMazzo.setVisible(true);
         } else {
             // Svuota le immagini quando il mazzo si esaurisce (ultime 3 mani)

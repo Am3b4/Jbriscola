@@ -37,7 +37,7 @@ public class CartaButton extends JButton {
         setFocusPainted(false);      // Rimuove il tratteggio quando cliccato
         setBorderPainted(false);     // Rimuove il bordo 3D di default di Windows/Mac
 
-        // 2. Aggiunta del listener per l'effetto hover (mouse sopra)
+        // 2. Aggiunta del listener per l'effetto hover
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
