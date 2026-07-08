@@ -19,11 +19,13 @@ public class BriscolaView extends JFrame {
     public static final String SCHERMATA_GIOCO = "GIOCO";
     public static final String SCHERMATA_PROFILO = "PROFILO";
     public static final String SCHERMATA_MODALITA = "MODALITA";
+    public static final String SCHERMATA_FINE_PARTITA = "FINE_PARTITA";
 
     // Riferimenti ai vari pannelli (le schermate vere e proprie)
     private final MainMenuPanel menuPanel;
     private final GamePanel gamePanel;
     private final SelezionaModalitaPanel modalitaPanel;
+    private final FinePartitaPanel finePartitaPanel;
     private final JPanel profiloPanel; // Per ora usiamo un JPanel generico come placeholder
 
     public BriscolaView() {
@@ -44,12 +46,14 @@ public class BriscolaView extends JFrame {
         menuPanel = new MainMenuPanel();
         gamePanel = new GamePanel();
         profiloPanel = new JPanel();
+        finePartitaPanel = new FinePartitaPanel();
 
         // 4. Aggiunta dei pannelli al CardLayout con la loro etichetta identificativa
         pannelloPrincipale.add(menuPanel, SCHERMATA_MENU);
         pannelloPrincipale.add(gamePanel, SCHERMATA_GIOCO);
         pannelloPrincipale.add(profiloPanel, SCHERMATA_PROFILO);
         pannelloPrincipale.add(modalitaPanel, SCHERMATA_MODALITA);
+        pannelloPrincipale.add(finePartitaPanel, SCHERMATA_FINE_PARTITA);
 
         // 5. Aggiunge il contenitore principale al JFrame
         add(pannelloPrincipale);
@@ -71,6 +75,9 @@ public class BriscolaView extends JFrame {
     public void mostraModalita() {
         cardLayout.show(pannelloPrincipale, SCHERMATA_MODALITA);
     }
+    public void mostraFinePartita() {
+        cardLayout.show(pannelloPrincipale, SCHERMATA_FINE_PARTITA);
+    }
 
     // Getter per esporre i pannelli al Controller (utile per aggiungere gli ActionListener)
     public MainMenuPanel getMenuPanel() {
@@ -81,5 +88,9 @@ public class BriscolaView extends JFrame {
     }
     public SelezionaModalitaPanel getModalitaPanel() {
         return modalitaPanel;
+    }
+
+    public FinePartitaPanel getFinePartitaPanel() {
+        return finePartitaPanel;
     }
 }

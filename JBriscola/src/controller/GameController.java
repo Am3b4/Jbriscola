@@ -39,6 +39,7 @@ public class GameController {
         vista.getModalitaPanel().getBtn4Giocatori().addActionListener(e -> onNuovaPartita(4));
         vista.getModalitaPanel().getBtnIndietro().addActionListener(e -> vista.mostraMenu());
         
+        
         // 4. Collega le azioni per le carte di gioco
         vista.getGamePanel().setCartaListener(e -> {
             // Estrae il bottone che è stato cliccato
@@ -46,6 +47,9 @@ public class GameController {
             // Chiama la logica passando la Carta logica
             onCartaSelezionata(btnCliccato.getCarta());
         });
+        
+        // 5. Collega la fine parita al menu principale
+        vista.getFinePartitaPanel().getBtnTornaMenu().addActionListener(e -> vista.mostraMenu());
     }
 
     /**
@@ -132,7 +136,7 @@ public class GameController {
                         modello.getBriscola().getSeme()
                     );
                     
-                    System.out.println("[CONTROLLER] Il Bot " + bot.getNome() + " gioca: " + scelta);
+                    System.out.println("[CONTROLLER] Il " + bot.getNome() + " gioca: " + scelta);
                     
                     // 2. Applichiamo la giocata
                     modello.giocaCarta(scelta);
@@ -166,7 +170,45 @@ public class GameController {
     }
 
     public void gestisciFinePartita() {
-        System.out.println("[CONTROLLER] Partita conclusa. (Da implementare)");
+        System.out.println("[CONTROLLER] Partita conclusa. Calcolo risultati...");
+        
+        int numGiocatori = modello.getGiocatori().size();
+        int puntiTeam1 = 0;
+        int puntiTeam2 = 0;
+        String nomeTeam1 = "";
+        String nomeTeam2 = "";
+
+        // Aggreghiamo i punteggi (proprio come nell'InfoPartitaPanel)
+        if (numGiocatori == 2) {
+            nomeTeam1 = modello.getGiocatori().get(0).getNome();
+            puntiTeam1 = modello.getGiocatori().get(0).getPunteggio();
+            
+            nomeTeam2 = modello.getGiocatori().get(1).getNome();
+            puntiTeam2 = modello.getGiocatori().get(1).getPunteggio();
+        } else if (numGiocatori == 4) {
+            nomeTeam1 = "Noi (Tu + Socio)";
+            puntiTeam1 = modello.getGiocatori().get(0).getPunteggio() + modello.getGiocatori().get(2).getPunteggio();
+            
+            nomeTeam2 = "Loro (Bot Sx/Dx)";
+            puntiTeam2 = modello.getGiocatori().get(1).getPunteggio() + modello.getGiocatori().get(3).getPunteggio();
+        }
+
+        // Determina la stringa del vincitore
+        String vincitoreTesto;
+        if (puntiTeam1 > puntiTeam2) {
+            vincitoreTesto = "Ha vinto: " + nomeTeam1 + "!";
+        } else if (puntiTeam2 > puntiTeam1) {
+            vincitoreTesto = "Ha vinto: " + nomeTeam2 + "!";
+        } else {
+            vincitoreTesto = "Pareggio!";
+        }
+
+        // Formatta i punti
+        String punteggiTesto = nomeTeam1 + " " + puntiTeam1 + "  -  " + puntiTeam2 + " " + nomeTeam2;
+        
+        // Passa i dati alla View e mostra la schermata
+        vista.getFinePartitaPanel().impostaRisultato(vincitoreTesto, punteggiTesto);
+        vista.mostraFinePartita();
     }
 
     /**
