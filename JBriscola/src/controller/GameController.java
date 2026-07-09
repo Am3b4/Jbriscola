@@ -39,6 +39,8 @@ public class GameController {
         vista.getModalitaPanel().getBtn4Giocatori().addActionListener(e -> onNuovaPartita(4));
         vista.getModalitaPanel().getBtnIndietro().addActionListener(e -> vista.mostraMenu());
         
+        vista.getMenuPanel().getBtnProfilo().addActionListener(e -> vista.mostraProfilo());
+        
         
         // 4. Collega le azioni per le carte di gioco
         vista.getGamePanel().setCartaListener(e -> {
@@ -73,7 +75,7 @@ public class GameController {
             nuoviGiocatori.add(new model.GiocatoreAI("Bot Socio", strategia)); 
             nuoviGiocatori.add(new model.GiocatoreAI("Bot Sinistra",strategia)); 
         }
-
+        util.AudioMananger.getInstance().riproduci("Shuffle.wav");
         modello.impostaGiocatori(nuoviGiocatori);
         modello.iniziaPartita();
         vista.mostraGioco();
@@ -88,7 +90,7 @@ public class GameController {
     public void onCartaSelezionata(model.Carta carta) {
         if (modello.getStato() == StatoPartita.ATTESA_GIOCATORE) {
             System.out.println("[CONTROLLER] L'utente gioca: " + carta);
-            
+            util.AudioMananger.getInstance().riproduci("MettiCarta.wav");
             modello.giocaCarta(carta);
             
             verificaStatoPartita();
@@ -139,6 +141,7 @@ public class GameController {
                     System.out.println("[CONTROLLER] Il " + bot.getNome() + " gioca: " + scelta);
                     
                     // 2. Applichiamo la giocata
+                    util.AudioMananger.getInstance().riproduci("MettiCarta.wav");
                     modello.giocaCarta(scelta);
                     
                     // 3. Loop: Controlliamo di nuovo lo stato. 
@@ -162,6 +165,7 @@ public class GameController {
             modello.avanzaTurno(); 
             
             // Controlla chi deve giocare la prossima carta
+            util.AudioMananger.getInstance().riproduci("PescaCarta.wav");
             verificaStatoPartita(); 
         });
         
@@ -197,8 +201,10 @@ public class GameController {
         String vincitoreTesto;
         if (puntiTeam1 > puntiTeam2) {
             vincitoreTesto = "Ha vinto: " + nomeTeam1 + "!";
+            util.AudioMananger.getInstance().riproduci("Win.wav");
         } else if (puntiTeam2 > puntiTeam1) {
             vincitoreTesto = "Ha vinto: " + nomeTeam2 + "!";
+            util.AudioMananger.getInstance().riproduci("Lose.wav");
         } else {
             vincitoreTesto = "Pareggio!";
         }

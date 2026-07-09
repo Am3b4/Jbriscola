@@ -106,17 +106,22 @@ public class GamePanel extends JPanel implements Observer {
             carteDaMostrare = modello.getManoCorrente().getCarteGiocate();
         }
         
-        // 1. Aggiorna il tavolo
+        // Ricaviamo i dati necessari
+        int numGiocatori = modello.getGiocatori().size();
+        int turnoAttualeIndex = modello.getGiocatori().indexOf(modello.getGiocatoreCorrente());
+
+        // 1. Aggiorna il tavolo (Passando i nuovi parametri)
         tavoloPanel.aggiornaTavolo(
             carteDaMostrare,
             modello.getBriscola(), 
-            modello.getMazzo().size()
+            modello.getMazzo().size(),
+            numGiocatori,
+            turnoAttualeIndex
         );
 
         // 2. Aggiorna la mano del giocatore umano
         manoPanel.aggiornaMano(modello.getGiocatori().get(0).getMano());
         
-        int numGiocatori = modello.getGiocatori().size();
         if (numGiocatori == 2) {
             // Modalità 1v1: Usa solo il pannello in alto (Indice 1)
             botTopPanel.aggiornaMano(modello.getGiocatori().get(1).getMano().size());

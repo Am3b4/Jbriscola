@@ -26,7 +26,7 @@ public class BriscolaView extends JFrame {
     private final GamePanel gamePanel;
     private final SelezionaModalitaPanel modalitaPanel;
     private final FinePartitaPanel finePartitaPanel;
-    private final JPanel profiloPanel; // Per ora usiamo un JPanel generico come placeholder
+    private final ProfiloPanel profiloPanel;
 
     public BriscolaView() {
         super("JBriscola - Metodologie di Programmazione");
@@ -45,7 +45,7 @@ public class BriscolaView extends JFrame {
         // 3. Istanziazione dei pannelli specifici
         menuPanel = new MainMenuPanel();
         gamePanel = new GamePanel();
-        profiloPanel = new JPanel();
+        profiloPanel = new ProfiloPanel();
         finePartitaPanel = new FinePartitaPanel();
 
         // 4. Aggiunta dei pannelli al CardLayout con la loro etichetta identificativa
@@ -92,5 +92,9 @@ public class BriscolaView extends JFrame {
 
     public FinePartitaPanel getFinePartitaPanel() {
         return finePartitaPanel;
+    }
+    
+    public ProfiloPanel getProfiloPanel() {
+    	return profiloPanel;
     }
 }

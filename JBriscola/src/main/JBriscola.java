@@ -11,6 +11,7 @@ import model.GiocatoreAI;
 import model.GiocatoreUmano;
 import model.PartitaModel;
 import model.StrategiaRandom;
+import controller.ProfiloController;
 import view.BriscolaView;
 
 public class JBriscola {
@@ -33,6 +34,7 @@ public class JBriscola {
             
             // 4. Crea il Controller (che collega Model e View)
             GameController controller = new GameController(modello, vista);
+            ProfiloController ProfiloController = new ProfiloController(vista);
             
             // 5. Mostra la finestra iniziale
             vista.setVisible(true);

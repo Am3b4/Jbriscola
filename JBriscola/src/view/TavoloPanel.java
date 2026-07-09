@@ -25,6 +25,7 @@ public class TavoloPanel extends JPanel {
     private JLabel lblBriscola;
     private JLabel lblContatoreMazzo;
     private JLabel lblRetroMazzo;
+    private JLabel[] slotCarte;
     
     private ImageLoader imageLoader;
 
@@ -63,19 +64,66 @@ public class TavoloPanel extends JPanel {
         	lblRetroMazzo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         }
 
-        // Immagine della Briscola (scoperta sotto il mazzo)
-        lblBriscola = new JLabel(); 
+        // Immagine della Briscola (scoperta sotto il mazzo) con effetto Highlight dorato SPESSO
+        lblBriscola = new JLabel() {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                if (getIcon() != null) {
+                    java.awt.Graphics2D g2d = (java.awt.Graphics2D) g;
+                    // Attiviamo l'antialiasing per rendere i bordi curvi
+                    g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    
+                    // 1. Disegna il bagliore solido e molto più spesso (es. 6 pixel)
+                    g2d.setStroke(new java.awt.BasicStroke(6.0f)); 
+                    g2d.setColor(Color.YELLOW);
+                    // Rimpiccioliamo le coordinate di 3 pixel per non "tagliare" il bordo fuori dalla JLabel
+                    g2d.drawRoundRect(3, 3, getWidth() - 6, getHeight() - 6, 15, 15);
+                    
+                    // 2. Riempe il centro con un giallo semi-trasparente
+                    g2d.setColor(new Color(255, 215, 0, 100)); 
+                    g2d.fillRoundRect(3, 3, getWidth() - 6, getHeight() - 6, 15, 15);
+                }
+                super.paintComponent(g); // Disegna l'immagine vera e propria SOPRA il bagliore
+            }
+        };
+        // FONDAMENTALE: Aggiungiamo uno spazio vuoto di 8 pixel attorno alla carta 
+        // così il bordo giallo ha lo spazio fisico per essere disegnato senza essere coperto
+        lblBriscola.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        lblBriscola.setHorizontalAlignment(JLabel.CENTER);
+        lblBriscola.setVerticalAlignment(JLabel.CENTER);
         
         areaMazzo.add(lblContatoreMazzo);
         areaMazzo.add(lblRetroMazzo);
         areaMazzo.add(lblBriscola);
 
         //ZONA CARTE SUL TAVOLO (Posizionata al centro)
-        carteGiocatePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
+        // 1. IL WRAPPER: Questo assicura che la croce stia sempre in mezzo al tavolo vuoto
+        JPanel centerWrapper = new JPanel(new java.awt.GridBagLayout());
+        centerWrapper.setOpaque(false);
+        
+        // 2. LA CROCE: Layout assoluto con dimensioni fisse
+        carteGiocatePanel = new JPanel();
+        carteGiocatePanel.setLayout(null); 
+        carteGiocatePanel.setPreferredSize(new java.awt.Dimension(400, 380));
         carteGiocatePanel.setOpaque(false);
+        
+        // 3. Creiamo 4 slot fissi e li aggiungiamo alla croce
+        slotCarte = new JLabel[4];
+        for (int i = 0; i < 4; i++) {
+            slotCarte[i] = new JLabel();
+            carteGiocatePanel.add(slotCarte[i]);
+        }
+        
+        // 4. Assegniamo le coordinate esatte (x, y, larghezza, altezza) per formare una croce
+        slotCarte[0].setBounds(120, 230, 100, 150); // SUD (Giocatore 0 - Tu)
+        slotCarte[1].setBounds(240, 115, 100, 150); // EST (Giocatore 1 - Bot Destra)
+        slotCarte[2].setBounds(120, 0, 100, 150);   // NORD (Giocatore 2 - Bot CPU / Socio)
+        slotCarte[3].setBounds(0, 115, 100, 150);  // OVEST (Giocatore 3 - Bot Sinistra)
 
+        centerWrapper.add(carteGiocatePanel);
+        
         add(areaMazzo, BorderLayout.WEST);
-        add(carteGiocatePanel, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
     }
 
     /**
@@ -85,44 +133,65 @@ public class TavoloPanel extends JPanel {
      * @param briscola La carta di briscola.
      * @param carteRimanenti Il numero di carte rimaste nel mazzo.
      */
-    public void aggiornaTavolo(List<Carta> carteSulTavolo, Carta briscola, int carteRimanenti) {
+    public void aggiornaTavolo(List<Carta> carteSulTavolo, Carta briscola, int carteRimanenti, int numGiocatori, int turnoAttualeIndex) {
         
-        // 1. Aggiorna il contatore testuale
+        // 1. Aggiorna il contatore e la Briscola
         lblContatoreMazzo.setText("Mazzo: " + carteRimanenti);
-
-        // 2. Aggiorna l'area del Mazzo e della Briscola
-        // Se ci sono carte nel mazzo, la briscola è ancora visibile sotto
         if (carteRimanenti > 0 && briscola != null) {
             String percorsoBriscola = imageLoader.getPercorsoCarta(briscola);
-            ImageIcon iconaBriscola = imageLoader.getImmagineScalata(percorsoBriscola, 80, 120);
+            ImageIcon iconaBriscola = imageLoader.getImmagineScalata(percorsoBriscola, 100, 150);
             
             if (iconaBriscola != null && iconaBriscola.getIconWidth() > 0) {
                 lblBriscola.setIcon(iconaBriscola);
-                lblBriscola.setText(""); // Pulisce eventuale testo
+                lblBriscola.setText(""); 
             } else {
                 lblBriscola.setText("[" + briscola.getValore() + " " + briscola.getSeme() + "]");
                 lblBriscola.setForeground(Color.WHITE);
             }
             lblRetroMazzo.setVisible(true);
         } else {
-            // Svuota le immagini quando il mazzo si esaurisce (ultime 3 mani)
             lblBriscola.setIcon(null);
             lblRetroMazzo.setVisible(false);
         }
 
-        // 3. Aggiorna le carte giocate al centro del tavolo
-        carteGiocatePanel.removeAll();
-        for (Carta c : carteSulTavolo) {
-        	String percorsoImg = imageLoader.getPercorsoCarta(c);
-            ImageIcon icona = imageLoader.getImmagineScalata(percorsoImg, 100, 150);
-            
-            // Usiamo delle semplici JLabel per le carte sul tavolo, perché non devono essere cliccabili
-            JLabel lblCartaGiocata = new JLabel(icona);
-            carteGiocatePanel.add(lblCartaGiocata);
+        // 2. Svuota tutti gli slot del tavolo preventivamente
+        for (int i = 0; i < 4; i++) {
+            slotCarte[i].setIcon(null); 
         }
 
-        // Ridisegna il pannello
+        // 3. Calcola di chi è la carta e la mette nel suo posto fisso
+        int carteGiocateNum = carteSulTavolo.size();
+        int indicePartenza;
+        
+        if (carteGiocateNum == numGiocatori && carteGiocateNum > 0) {
+            // Chi ha giocato l'ultima carta è l'attuale turnoAttualeIndex.
+            // Di conseguenza, chi ha *iniziato* la mano è il giocatore successivo (ciclicamente).
+            indicePartenza = (turnoAttualeIndex + 1) % numGiocatori;
+        } else {
+            // Mano in corso: il turno è avanzato regolarmente
+            indicePartenza = (turnoAttualeIndex - carteGiocateNum + numGiocatori) % numGiocatori;
+        }
+
+        for (int i = 0; i < carteGiocateNum; i++) {
+            String percorsoImg = imageLoader.getPercorsoCarta(carteSulTavolo.get(i));
+            ImageIcon icona = imageLoader.getImmagineScalata(percorsoImg, 100, 150);
+            
+            // Trova l'indice assoluto del giocatore che ha giocato questa specifica carta
+            int indiceGiocatore = (indicePartenza + i) % numGiocatori;
+            
+            if (numGiocatori == 2) {
+                // In 1v1: L'indice 0 (Tu) va a Sud(0), l'indice 1 (Bot) va a Nord(2)
+                int slotIndex = (indiceGiocatore == 0) ? 0 : 2;
+                slotCarte[slotIndex].setIcon(icona);
+            } else {
+                // In 2v2: Gli indici (0,1,2,3) corrispondono perfettamente agli slot (Sud, Est, Nord, Ovest)
+                slotCarte[indiceGiocatore].setIcon(icona);
+            }
+        }
+
         revalidate();
         repaint();
     }
+    
+    public JLabel[] getSlotCarte() { return slotCarte; }
 }

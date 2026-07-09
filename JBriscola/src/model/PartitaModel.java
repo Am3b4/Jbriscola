@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("deprecation")
 public class PartitaModel extends Observable {
 	
-	private final Mazzo mazzo;
+	private Mazzo mazzo;
 	private final List<Giocatore> giocatori;
 	private Carta briscola;
 	private Mano manoAttuale;
@@ -42,6 +42,7 @@ public class PartitaModel extends Observable {
      */
     public void iniziaPartita() {
         // 1. Preparazione del mazzo
+    	this.mazzo = new Mazzo();
         mazzo.mescola();
         this.briscola = mazzo.peekUltima();  
         
